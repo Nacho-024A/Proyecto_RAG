@@ -1,0 +1,7 @@
+pymupdf #Librería para trabajar con archivos PDF
+chromadb #Librería para trabajar con bases de datos vectoriales
+sentence-transformers #Librería para generar embeddings de texto
+requests #Librería para hacer solicitudes HTTP
+python-dotenv #Librería para cargar variables de entorno desde un archivo .env
+streamlit #Librería para crear aplicaciones web interactivas
+pandas #Librería para análisis y manipulación de datos
