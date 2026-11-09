@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const MOCK = true;
+  const MOCK = false; // true para probar sin backend, false para usar el servidor FastAPI
   const MAX_BYTES = 200 * 1024 * 1024;
 
   /* ---------------------------------------------------------------- */
@@ -74,17 +74,10 @@
     pageUrl: mockPageUrl,
   };
 
-  // --- Real: rutas que debe exponer el servidor FastAPI
-  //   GET    /api/chats                  -> [{id, name, n_pages}]
-  //   POST   /api/chats  (form: file)    -> {id, name, n_pages, n_chunks, messages: []}
-  //   GET    /api/chats/{id}             -> {id, name, n_pages, messages: [{role, text, pages}]}
-  //   POST   /api/chats/{id}/ask {question} -> {answer, pages}
-  //   GET    /api/chats/{id}/pages/{n}.png  -> imagen de la página
-  //   DELETE /api/chats/{id}
   async function json(res) {
     if (!res.ok) {
       let detail;
-      try { detail = (await res.json()).detail; } catch (e) { /* sin cuerpo */ }
+      try { const d = (await res.json()).detail; detail = typeof d === 'string' ? d : null; } catch (e) { /* sin cuerpo */ }
       throw new Error(detail || 'Error ' + res.status);
     }
     return res.json();
