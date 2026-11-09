@@ -17,7 +17,7 @@ from pathlib import Path
 
 import fitz  # pymupdf
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -70,7 +70,7 @@ def write_meta(d: Path, meta: dict) -> None:
 
 
 def get_index(chat_id: str) -> RAGIndex:
-    """Devuelve el índice del chat; si no está en memoria (ej. tras reiniciar), lo reconstruye del PDF."""
+    """Devuelve el índice del chat; si no está en memoria (p. ej. tras reiniciar), lo reconstruye del PDF."""
     with _build_lock:
         idx = _indexes.get(chat_id)
         if idx is None:
@@ -190,6 +190,13 @@ def page_image(chat_id: str, n: int):
     )
 
 
+@app.get("/api/chats/{chat_id}/file")
+def pdf_file(chat_id: str):
+    """El PDF original, para que el visor (pdf.js) lo muestre con texto seleccionable y zoom."""
+    d = chat_dir(chat_id)
+    return FileResponse(d / "documento.pdf", media_type="application/pdf")
+
+
 @app.delete("/api/chats/{chat_id}")
 def delete_chat(chat_id: str):
     d = chat_dir(chat_id)
@@ -205,7 +212,7 @@ def delete_chat(chat_id: str):
     return {"ok": True}
 
 
-# La interfaz web/ se sirve como archivos estáticos (HTML + JS + CSS)
+# La interfaz (debe ir al final, después de las rutas /api)
 app.mount("/", StaticFiles(directory=str(WEB), html=True), name="web")
 
 
