@@ -1,0 +1,3 @@
+PDF.js v3.11.174 (Mozilla) - licencia Apache-2.0 (ver LICENSE).
+Archivos: pdf.min.js, pdf.worker.min.js, pdf_viewer.css (copiados de npm: pdfjs-dist@3.11.174).
+Se sirven desde aqui para que el visor funcione sin internet.

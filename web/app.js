@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const MOCK = false; // true para probar sin backend, false para usar el servidor FastAPI
+  const MOCK = false;
   const MAX_BYTES = 200 * 1024 * 1024;
 
   /* ---------------------------------------------------------------- */
@@ -91,6 +91,7 @@
     }).then(json),
     remove: (id) => fetch('/api/chats/' + id, { method: 'DELETE' }).then(json),
     pageUrl: (chat, n) => '/api/chats/' + chat.id + '/pages/' + n + '.png',
+    pdfUrl: (chat) => '/api/chats/' + chat.id + '/file',
   };
 
   const api = MOCK ? mockApi : realApi;
@@ -121,6 +122,8 @@
     upload: $('#upload'), file: $('#file'), uploadLabel: $('#upload-label'), uploadHint: $('#upload-hint'), uploadMsg: $('#upload-msg'),
     messages: $('#messages'), question: $('#question'), send: $('#send'),
     pageImg: $('#page-img'), pageInput: $('#page-input'), total: $('#total'), prev: $('#prev'), next: $('#next'),
+    docScroll: $('#doc-scroll'), pdfPage: $('#pdf-page'), pdfCanvas: $('#pdf-canvas'), textLayer: $('#text-layer'),
+    docStatus: $('#doc-status'), zoom: $('#zoom'), zoomIn: $('#zoom-in'), zoomOut: $('#zoom-out'), zoomReset: $('#zoom-reset'),
     toggle: $('#toggle'), sidebar: $('#sidebar'), scrim: $('#scrim'), newChat: $('#new-chat'), history: $('#history'),
     confirm: $('#confirm'), confirmName: $('#confirm-name'), toast: $('#toast'),
   };
@@ -216,6 +219,7 @@
 
   function showHome() {
     state.chat = null;
+    releaseDocument();
     els.home.hidden = false;
     els.chatView.hidden = true;
     setUploadMessage('');
@@ -231,7 +235,8 @@
       els.home.hidden = true;
       els.chatView.hidden = false;
       renderMessages();
-      renderDoc();
+      renderControls();
+      loadDocument(chat);
       renderSidebar();
       syncToggleVisibility();
       els.question.focus();
@@ -291,18 +296,167 @@
     state.page = Math.max(1, Math.min(total, n));
     renderDoc();
   }
-  function renderDoc() {
+  /* PDF real con pdf.js: texto seleccionable y zoom.
+     Si pdf.js no carga o falla, se usa la imagen PNG de la página como respaldo. */
+  const pdfjs = window.pdfjsLib;
+  if (pdfjs) pdfjs.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+  const canUsePdfJs = () => !!pdfjs && typeof api.pdfUrl === 'function';
+
+  const ZOOM_MIN = 0.5, ZOOM_MAX = 4;
+  const view = { doc: null, mode: 'pdf', zoom: 1, token: 0, loadId: 0, task: null, textTask: null, lastPage: 0, timer: null };
+
+  function setDocMode(mode) {
+    view.mode = mode;
+    els.docScroll.hidden = mode !== 'pdf';
+    els.zoom.hidden = mode !== 'pdf';
+    els.pageImg.hidden = mode !== 'img';
+  }
+  function setDocStatus(msg) {
+    els.docStatus.hidden = !msg;
+    els.docStatus.textContent = msg || '';
+  }
+  function updateZoomUi() {
+    els.zoomReset.textContent = Math.round(view.zoom * 100) + '%';
+    els.zoomOut.disabled = view.zoom <= ZOOM_MIN + 1e-6;
+    els.zoomIn.disabled = view.zoom >= ZOOM_MAX - 1e-6;
+  }
+  function cancelRender() {
+    for (const k of ['task', 'textTask']) {
+      if (view[k]) { try { view[k].cancel(); } catch (e) { /* ya terminó */ } view[k] = null; }
+    }
+  }
+  function releaseDocument() {
+    view.loadId++;
+    view.token++;
+    clearTimeout(view.timer);
+    cancelRender();
+    if (view.doc) { Promise.resolve(view.doc.destroy()).catch(() => {}); view.doc = null; }
+  }
+
+  async function loadDocument(chat) {
+    releaseDocument();
+    view.zoom = 1;
+    view.lastPage = 0;
+    updateZoomUi();
+    els.pageImg.removeAttribute('src');
+    if (!canUsePdfJs()) { setDocMode('img'); drawPage(); return; }
+    setDocMode('pdf');
+    setDocStatus('Cargando documento…');
+    const id = view.loadId;
+    try {
+      const doc = await pdfjs.getDocument({ url: api.pdfUrl(chat), standardFontDataUrl: 'vendor/pdfjs/standard_fonts/' }).promise;
+      if (id !== view.loadId) { doc.destroy(); return; }
+      view.doc = doc;
+      setDocStatus('');
+      drawPage();
+    } catch (e) {
+      if (id !== view.loadId) return;
+      console.error('pdf.js no pudo abrir el documento; se usa la imagen de cada página.', e);
+      setDocStatus('');
+      setDocMode('img');
+      drawPage();
+    }
+  }
+
+  async function renderPdfPage() {
+    const doc = view.doc;
+    if (!doc) return;
+    const token = ++view.token;
+    cancelRender();
+    try {
+      const page = await doc.getPage(state.page);
+      if (token !== view.token) return;
+
+      // "100%" = la página completa a la vista; el zoom parte de ahí
+      const base = page.getViewport({ scale: 1 });
+      const fit = Math.min(Math.max(els.docScroll.clientWidth, 50) / base.width, Math.max(els.docScroll.clientHeight, 50) / base.height);
+      const viewport = page.getViewport({ scale: fit * view.zoom });
+
+      let dpr = window.devicePixelRatio || 1;
+      const maxPixels = 16e6; // evita canvas gigantes con zoom alto
+      if (viewport.width * viewport.height * dpr * dpr > maxPixels) dpr = Math.sqrt(maxPixels / (viewport.width * viewport.height));
+
+      const w = Math.floor(viewport.width), h = Math.floor(viewport.height);
+      els.pdfPage.style.width = w + 'px';
+      els.pdfPage.style.height = h + 'px';
+      els.pdfCanvas.width = Math.floor(viewport.width * dpr);
+      els.pdfCanvas.height = Math.floor(viewport.height * dpr);
+      els.pdfCanvas.style.width = w + 'px';
+      els.pdfCanvas.style.height = h + 'px';
+      els.textLayer.replaceChildren();
+      els.textLayer.style.setProperty('--scale-factor', String(viewport.scale));
+
+      view.task = page.render({
+        canvasContext: els.pdfCanvas.getContext('2d'),
+        viewport,
+        transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
+      });
+      await view.task.promise;
+      if (token !== view.token) return;
+
+      if (view.lastPage !== state.page) { els.docScroll.scrollTop = 0; els.docScroll.scrollLeft = 0; view.lastPage = state.page; }
+
+      const content = await page.getTextContent();
+      if (token !== view.token) return;
+      view.textTask = pdfjs.renderTextLayer({ textContentSource: content, container: els.textLayer, viewport, textDivs: [] });
+      await view.textTask.promise;
+    } catch (e) {
+      if (token !== view.token || (e && e.name === 'RenderingCancelledException')) return;
+      console.error('Error al dibujar la página; se usa la imagen de respaldo.', e);
+      setDocMode('img');
+      drawPage();
+    }
+  }
+
+  function drawPage() {
+    if (!state.chat) return;
+    if (view.mode === 'img') {
+      els.pageImg.classList.remove('is-error');
+      els.pageImg.alt = 'Página ' + state.page + ' de ' + state.chat.n_pages + ' de ' + state.chat.name;
+      els.pageImg.src = api.pageUrl(state.chat, state.page);
+    } else if (view.doc) {
+      renderPdfPage();
+    }
+  }
+
+  function setZoom(z, delayed) {
+    view.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
+    updateZoomUi();
+    clearTimeout(view.timer);
+    if (delayed) view.timer = setTimeout(drawPage, 120); else drawPage();
+  }
+
+  function renderControls() { // Actualiza los controles de navegación de páginas
     const chat = state.chat;
-    els.pageImg.classList.remove('is-error');
-    els.pageImg.alt = 'Página ' + state.page + ' de ' + chat.n_pages + ' de ' + chat.name;
-    els.pageImg.src = api.pageUrl(chat, state.page);
     els.pageInput.max = String(chat.n_pages);
     els.pageInput.value = String(state.page);
     els.total.textContent = '/ ' + chat.n_pages;
     els.prev.disabled = state.page <= 1;
     els.next.disabled = state.page >= chat.n_pages;
   }
+  function renderDoc() { renderControls(); drawPage(); } // Funcion que se llama cada vez que cambia la página, para actualizar controles y dibujar la página
+
   els.pageImg.addEventListener('error', () => els.pageImg.classList.add('is-error'));
+  els.zoomIn.addEventListener('click', () => setZoom(view.zoom + 0.25));
+  els.zoomOut.addEventListener('click', () => setZoom(view.zoom - 0.25));
+  els.zoomReset.addEventListener('click', () => setZoom(1));
+  // Ctrl + rueda del mouse = zoom
+  els.docScroll.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey || view.mode !== 'pdf') return;
+    e.preventDefault();
+    setZoom(view.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1), true);
+  }, { passive: false });
+  els.docScroll.addEventListener('keydown', (e) => {
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); setZoom(view.zoom + 0.25); }
+    else if (e.key === '-') { e.preventDefault(); setZoom(view.zoom - 0.25); }
+    else if (e.key === '0') { e.preventDefault(); setZoom(1); }
+  });
+  // al cambiar el tamaño de la ventana, se vuelve a ajustar la página
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (state.chat && view.mode === 'pdf') drawPage(); }, 200);
+  });
   els.prev.addEventListener('click', () => goto(state.page - 1));
   els.next.addEventListener('click', () => goto(state.page + 1));
   els.pageInput.addEventListener('change', () => goto(els.pageInput.value));

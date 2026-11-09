@@ -1,5 +1,5 @@
 /* ===== Nexora — estilos =====
-   Paleta del mockup. Fuente del título: Michegar*/
+   Paleta del mockup. Fuente del título: Michegar (si no está, Kaushan Script). */
 @font-face {
   font-family: "Michegar";
   src: local("Michegar"),
@@ -202,12 +202,28 @@ button:disabled { cursor: default; }
 
 .doc-col { grid-column: 4; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .doc-card {
+  position: relative;
   flex: 1; min-height: 0;
-  display: grid; place-items: center;
   background: #fff; border-radius: var(--radius); overflow: hidden;
 }
-.doc-card img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.doc-scroll { position: absolute; inset: 0; display: flex; overflow: auto; scrollbar-width: thin; scrollbar-color: #aab4c0 transparent; }
+.doc-scroll:focus-visible { outline-offset: -4px; }
+.pdf-page { position: relative; flex: none; margin: auto; background: #fff; line-height: 0; }
+.pdf-page canvas { display: block; }
+.doc-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .doc-card img.is-error { visibility: hidden; }
+.doc-status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: #4b5563; pointer-events: none; }
+.zoom {
+  position: absolute; right: 14px; bottom: 14px; z-index: 5;
+  display: flex; align-items: center; gap: 2px; padding: 4px;
+  background: rgba(17, 24, 39, .88); border-radius: 999px;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+}
+.zoom button { min-width: 34px; height: 34px; padding: 0 8px; border-radius: 999px; color: var(--ink); font-weight: 700; font-size: 1.05rem; transition: background .15s, color .15s; }
+.zoom button:hover:not(:disabled) { background: var(--raised); color: #fff; }
+.zoom button:disabled { opacity: .35; }
+#zoom-reset { min-width: 54px; font-size: .85rem; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .arrow { width: clamp(44px, 5.2vw, 72px); color: var(--ink); transition: transform .15s, opacity .15s; }
 .arrow svg { display: block; width: 100%; height: auto; fill: currentColor; }
@@ -326,5 +342,5 @@ dialog strong { color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-    .spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
+  .spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
 }

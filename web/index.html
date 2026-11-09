@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/pdfjs/pdf_viewer.css"> <!-- PDF.js viewer styles, carpeta para tratamiendo de PDF en el frontend sin depender del backend ni de conexión -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -51,7 +52,21 @@
   </section>
 
   <section class="doc-col" aria-label="Documento">
-    <div class="doc-card"><img id="page-img" alt=""></div>
+    <div class="doc-card">
+      <div class="doc-scroll" id="doc-scroll" tabindex="0" aria-label="Página del documento">
+        <div class="pdf-page" id="pdf-page">
+          <canvas id="pdf-canvas"></canvas>
+          <div class="textLayer" id="text-layer"></div>
+        </div>
+      </div>
+      <img id="page-img" alt="" hidden>
+      <p class="doc-status" id="doc-status" hidden></p>
+      <div class="zoom" id="zoom" role="group" aria-label="Zoom del documento">
+        <button type="button" id="zoom-out" aria-label="Alejar">−</button>
+        <button type="button" id="zoom-reset" aria-label="Ajustar a la página" title="Ajustar a la página">100%</button>
+        <button type="button" id="zoom-in" aria-label="Acercar">+</button>
+      </div>
+    </div>
     <div class="pager">
       <button class="arrow" id="prev" type="button" aria-label="Página anterior"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
       <div class="counter">
@@ -89,6 +104,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="vendor/pdfjs/pdf.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
