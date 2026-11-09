@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nexora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Iconos -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-upload" viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="8" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="16" cy="10" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+  <symbol id="i-chevrons" viewBox="0 0 76 76"><polyline points="8 12 30 38 8 64"/><polyline points="28 12 50 38 28 64"/><polyline points="48 12 70 38 48 64"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 90 70"><path d="M0 35 38 0v22h52v26H38v22z"/></symbol>
+</svg>
+
+<!-- ===== Pantalla de inicio ===== -->
+<main id="home" class="home">
+  <header class="brand">
+    <h1 class="gradient-text">NEXORA</h1>
+    <p class="gradient-text">Connected Knowledge. Intelligent Answers</p>
+  </header>
+  <div>
+    <div class="upload" id="upload">
+      <input class="file-input" id="file" type="file" accept="application/pdf,.pdf" aria-label="Subir un documento PDF">
+      <span class="upload-btn" id="upload-btn"><svg class="i" aria-hidden="true"><use href="#i-upload"/></svg><span class="spinner" aria-hidden="true"></span><span id="upload-label">Upload</span></span>
+      <span class="upload-hint" id="upload-hint">200MB per file - PDF</span>
+    </div>
+    <p class="upload-msg" id="upload-msg" role="status" aria-live="polite"></p>
+  </div>
+</main>
+
+<!-- ===== Pantalla principal ===== -->
+<main id="chat-view" class="chat-view" hidden>
+  <section class="chat-panel" aria-label="Chat">
+    <div class="messages" id="messages" aria-live="polite"></div>
+    <div class="composer">
+      <textarea id="question" rows="1" placeholder="Escribe tu pregunta sobre el documento" aria-label="Escribe tu pregunta"></textarea>
+      <button class="send" id="send" type="button" aria-label="Enviar pregunta" disabled><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></button>
+    </div>
+  </section>
+
+  <section class="doc-col" aria-label="Documento">
+    <div class="doc-card"><img id="page-img" alt=""></div>
+    <div class="pager">
+      <button class="arrow" id="prev" type="button" aria-label="Página anterior"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <div class="counter">
+        <input id="page-input" type="number" min="1" value="1" inputmode="numeric" aria-label="Número de página">
+        <span id="total">/ 1</span>
+      </div>
+      <button class="arrow arrow-next" id="next" type="button" aria-label="Página siguiente"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    </div>
+  </section>
+</main>
+
+<!-- ===== Barra lateral ===== -->
+<button class="toggle" id="toggle" type="button" aria-label="Abrir historial de chats" aria-expanded="false" aria-controls="sidebar" hidden>
+  <svg class="i" aria-hidden="true"><use href="#i-chevrons"/></svg>
+</button>
+<div class="scrim" id="scrim"></div>
+<aside class="sidebar" id="sidebar" aria-label="Historial de chats" inert>
+  <h2>NEXORA</h2>
+  <hr>
+  <button class="new-chat" id="new-chat" type="button"><svg class="i" aria-hidden="true"><use href="#i-chat"/></svg><span>Chat Nuevo</span></button>
+  <ul class="history" id="history"></ul>
+</aside>
+
+<!-- ===== Confirmación de borrado ===== -->
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <form method="dialog">
+    <h3 id="confirm-title">¿Eliminar este chat?</h3>
+    <p>Se borrará la conversación de <strong id="confirm-name"></strong>. Esta acción no se puede deshacer.</p>
+    <div class="dialog-actions">
+      <button class="btn" value="cancel" autofocus>Cancelar</button>
+      <button class="btn btn-danger" value="delete">Eliminar</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
