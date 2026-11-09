@@ -3,5 +3,6 @@ chromadb #Librería para trabajar con bases de datos vectoriales
 sentence-transformers #Librería para generar embeddings de texto
 requests #Librería para hacer solicitudes HTTP
 python-dotenv #Librería para cargar variables de entorno desde un archivo .env
-streamlit #Librería para crear aplicaciones web interactivas
-pandas #Librería para análisis y manipulación de datos
+fastapi #Framework web para construir APIs
+uvicorn #Servidor ASGI para ejecutar aplicaciones FastAPI
+python-multipart #Librería para manejar solicitudes multipart/form-data
