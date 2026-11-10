@@ -154,7 +154,7 @@ Banco de 20 preguntas: 16 con respuesta en el documento (10 directas y 6 de rela
 **Requisitos:** Python 3.10 o superior (probado en 3.13), una llave gratuita de Google AI Studio y conexión a internet para la API. En la primera ejecución se descarga el modelo de embeddings (unos 120 MB).
 
 ```powershell
-git clone [URL del repositorio]
+git clone https://github.com/Nacho-024A/Proyecto_RAG
 cd proyecto_rag
 python -m venv .venv
 .venv\Scripts\Activate.ps1
