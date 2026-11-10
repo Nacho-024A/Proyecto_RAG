@@ -32,7 +32,7 @@ def get_embedder():
 
 
 class RAGIndex:
-    def __init__(self, chunk_size=800, overlap=150, top_k=4):
+    def __init__(self, chunk_size=400, overlap=80, top_k=5):
         self.chunk_size, self.overlap, self.top_k = chunk_size, overlap, top_k
         self.client = chromadb.EphemeralClient()
         self.col = None
