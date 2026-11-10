@@ -36,13 +36,13 @@ Este proyecto implementa un sistema de generación aumentada por recuperación (
 
 **Preprocesamiento:** El texto se extrae página por página (PyMuPDF), se normalizan los espacios y se parte en fragmentos *dentro* de cada página, con solape del 20%. Así ningún fragmento cruza páginas y cada uno conserva su número de página exacto.
 
-**Limitaciones y sesgos:** Un solo documento; solo PDF con texto (sin OCR, un PDF escaneado se rechaza con aviso); el banco es pequeño y lo escribió quien desarrolló el sistema, por lo que puede favorecerlo. **Licencia:** el reglamento es propiedad de la universidad y se usa con fines académicos. Dicho documento se encuentra dentro del repositorio de la carpeta de data/reglamento.pdf
+**Limitaciones y sesgos:** Un solo documento; solo PDF con texto (sin OCR, un PDF escaneado se rechaza con aviso); el banco es pequeño y lo escribió quien desarrolló el sistema, por lo que puede favorecerlo. **Licencia:** el reglamento es propiedad de la universidad y se usa con fines académicos. El documento se incluye en el repositorio, en `data/reglamento.pdf`
 
 ## 4. Metodología
 
 1. **Indexación:** Extracción por página, chunking, embeddings con `paraphrase-multilingual-MiniLM-L12-v2` (local, funciona bien en español) y almacenamiento en Chroma con la página como metadato.
 2. **Recuperación:** Búsqueda por similitud coseno de los *k* fragmentos más cercanos a la pregunta.
-3. **Generación:** El fragmento y su página se pasan a Gemini (plan gratuito de Google AI Studio, modelo `[gemini-3.5-flash-lite]`, temperatura 0,2). El prompt exige responder solo con el contexto, decir "No encontré esa información en el documento" si no está, y citar `[Pág. N]`.
+3. **Generación:** Los fragmentos recuperados y sus páginas se pasan a Gemini (plan gratuito de Google AI Studio, modelo `[gemini-3.5-flash-lite]`, temperatura 0,2, se ouede configurar desde el `.env`). El prompt exige responder solo con el contexto, decir "No encontré esa información en el documento" si no está, y citar `[Pág. N]`.
 4. **Evaluación:** 7 configuraciones sobre las 20 preguntas (línea base + 6 de RAG). Se descartó un modelo más grande o un reranker por tiempo y por el límite del plan gratuito.
 5. **Despliegue:** Servidor FastAPI local que sirve la interfaz web (HTML/CSS/JS con PDF.js).
 
@@ -134,16 +134,16 @@ Banco de 20 preguntas: 16 con respuesta en el documento (10 directas y 6 de rela
 
 **Qué funcionó**
 - El RAG responde bien 12 de las 16 preguntas con respuesta (75%) contra 3 de la línea base (19%), y cumple el objetivo del 70%.
-- Elimina las alucinaciones: 0 de 20 respuestas frente a 11 de 20 de la línea base, que por ejemplo inventó un correo de soporte técnico y dio 25-30 horas por crédito cuando el reglamento dice 48.
+- Elimina las alucinaciones: El juez automático no detectó ninguna alucinación (0 de 20) frente a 11 de 20 en la línea base
 - Rechaza correctamente las 4 preguntas sin respuesta (la línea base solo 2).
-- Los fragmentos pequeños funcionan mejor: con k=5 la exactitud en directas va de 10 de 10 (400) a 8 (800) y 7 (1500), y k=5 supera a k=3 en los tres tamaños.
+- Los fragmentos pequeños funcionan mejor: con k=5 la exactitud en directas va de 10 de 10 (400) a 8 (800) y 7 (1500), y con k=5 la exactitud en directas es igual o mayor que con k=3 en los tres tamaños (empatan con chunk 800), y la recuperación también.
 
 **Qué no funcionó**
 - Las preguntas de relacionar información se quedan en 2 de 6 en todas las configuraciones. En la elegida, las 4 que fallan (reingreso, tercera pérdida de una asignatura, homologación y matrícula condicional) son **falsos rechazos**: el sistema dice "No encontré esa información" aunque la página correcta sí estaba entre las recuperadas. Todas son preguntas de dos partes. Una explicación probable, no verificada, es que el prompt estricto rechaza todo cuando solo llega una parte de la información entre los *k* fragmentos.
 
 **Limitaciones**
 - Con 16 preguntas con respuesta, una sola pregunta pesa 6 puntos porcentuales: las diferencias de una o dos preguntas entre configuraciones son tendencias y no resultados concluyentes.
-- La exactitud la califica el mismo modelo que responde, así que no es un juez independiente. Se revisó manualmente una muestra de [N] respuestas y hubo acuerdo en [X].
+- La exactitud la califica el mismo modelo que responde, así que no es un juez independiente. Se revisó manualmente una muestra de 100 respuestas y hubo acuerdo en 98, siendo estas por equivocacion en el banco de preguntas que hicieron que el juez fallara (Este error ya fue corregido).
 - La métrica de recuperación mide páginas, no si el fragmento exacto con la respuesta llegó, y puede sobrestimar la recuperación.
 - Al revisar los fallos se corrigieron dos páginas del banco que estaban mal anotadas (el RAG tenía razón), y las métricas de página de esta tabla ya incluyen esa corrección.
 - Un único documento, solo PDF con texto, y el plan gratuito de Gemini limita la cantidad de pruebas.
