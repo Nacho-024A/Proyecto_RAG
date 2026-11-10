@@ -1,0 +1,44 @@
+{Preguntas Directas}
+
+¿A cuantas horas de trabajo académico equivale un crédito académico?/A 48 horas de trabajo académico del estudiante durante un período académico./8
+-------
+¿Cuál es el porcentaje mínimo de créditos del pregrado que debe corresponder a la práctica estudiantil?/La práctica estudiantil no puede ser inferior al 10% del total de créditos del pregrado./9
+-------
+¿Cuál es el número máximo de créditos de Formación Humanística y Científica-Núcleo de Formación Institucional?/18 créditos, salvo excepciones establecidas por el Consejo Académico./9
+--------
+¿Qué porcentaje máximo de la calificación definitiva puede representar el mecanismo de asistencia establecido en el Pacto Pedagógico?/No puede exceder el 30% de la calificación definitiva./22
+-------
+¿Cuál es el recargo que se aplica a una matrícula extraordinaria?/Un recargo obligatorio del 20% sobre el valor liquidado por derechos de matrícula./20
+-------
+¿Qué porcentaje máximo de los créditos matriculados puede cancelar un estudiante durante un período académico?/Hasta el 50% de los créditos matriculados./23
+-------
+¿Qué calificación recibe un estudiante que no presenta una evaluación en la fecha y hora establecidas, sin una causa justificada?/Cero punto cero (0.0)./33
+-------
+¿Cuál es el plazo máximo para presentar una evaluación supletoria después de terminar la causa que motivó el aplazamiento?/Diez (10) días calendario siguientes a la terminación de la causa, respetando también el límite previo a la matrícula del siguiente período./33
+-------
+¿En cuánto tiempo máximo debe realizarse la retroalimentación de una evaluación ordinaria y de un examen final?/15 días calendario para evaluaciones ordinarias y 3 días calendario para exámenes finales./35
+-------
+¿Cuál es el correo electrónico al que se pueden reportar presuntas faltas disciplinarias?/comite.disciplinario@eafit.edu.co/59
+
+{Preguntas que requieren relacionar información}
+
+Si un estudiante pierde una asignatura por tercera vez, ¿qué condiciones debe cumplir para matricularla nuevamente y qué sucede si vuelve a perderla?/Debe matricularla en el semestre inmediatamente siguiente, bajo matrícula condicional y con un máximo de 12 créditos. Si la pierde por cuarta vez, queda retirado por rendimiento académico./24
+------
+¿Cuántas oportunidades de reingreso tiene un estudiante retirado por bajo promedio y qué sucede si vuelve a ser retirado por rendimiento académico una tercera vez?/Puede solicitar hasta dos reingresos al mismo programa. Si ocurre un tercer retiro por rendimiento académico, no podrá solicitar otro reingreso a ese programa./25
+------
+Si un estudiante desea homologar asignaturas cursadas en otra universidad, ¿qué nota mínima debe haber obtenido y qué porcentaje de los créditos del programa debe cursar obligatoriamente en EAFIT?/La nota aprobatoria mínima considerada para la homologación es 3.0. Además, debe cursar y aprobar en EAFIT al menos el 60% de los créditos del programa./19
+------
+Si un estudiante tiene matrícula condicional, ¿puede cancelar asignaturas y qué promedio debe alcanzar para cumplir las condiciones de esa matrícula?/No puede cancelar asignaturas, salvo fuerza mayor o caso fortuito comprobado ante el Comité de Casos. Debe obtener un promedio crédito semestral y acumulado igual o superior a 3.0./24-26
+------
+¿Qué ocurre si un estudiante no paga su matrícula ni obtiene financiación aprobada antes del vencimiento del plazo, pero intenta regularizar su situación durante las primeras dos semanas de clase?/Puede pagar con recargo, sin exceder la segunda semana de clase. Si al finalizar esa semana no ha pagado ni obtenido financiación formal, se revierte la matrícula y se retira de las listas de clase./20-21
+-------
+¿Puede un estudiante cancelar todos sus créditos matriculados y continuar automáticamente como estudiante regular el siguiente semestre? ¿Qué procedimiento debe realizar?/No. Al cancelar todos los créditos pierde la condición de estudiante y debe seguir el proceso de reintegro establecido por la Universidad./23
+
+{Preguntas sin respuesta en el documento}
+¿Cuál es el correo electrónico del departamento de soporte técnico de EAFIT para reportar problemas con los computadores personales?/No se encuentra esa información en el reglamento./[]
+------
+¿Cuánto cuesta exactamente la matrícula del programa de Ingeniería de Sistemas para el semestre 2027-1?/No se encuentra esa información en el reglamento./[]
+------
+¿Cuál es el horario de atención presencial de la Oficina de Registro Académico?/No se encuentra esa información en el reglamento./[]
+------
+¿Cuántos espacios de parqueadero para motocicletas tiene habilitados la Universidad EAFIT?/No se encuentra esa información en el reglamento./[]
