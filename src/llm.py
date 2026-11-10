@@ -1,4 +1,4 @@
-"""Único punto de contacto con el LLM (Gemini por REST, plan gratuito)."""
+"""Único punto de contacto con el LLM (Este parametro se cambian dentro del .env)."""
 import os
 import time
 import random
@@ -13,10 +13,12 @@ URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateC
 
 
 def generate(system, user, max_tokens=2048):
-    key = os.getenv("GEMINI_API_KEY")
+    key = os.getenv("IA_API_KEY") #Se obtiene la clave de API desde el archivo .env
     if not key:
-        raise RuntimeError("Falta GEMINI_API_KEY: revisa tu archivo .env en la raíz del proyecto.")
-    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
+        raise RuntimeError("Falta IA_API_KEY: revisa tu archivo .env en la raíz del proyecto.")
+    model = os.getenv("LLM_MODEL") #Se obtiene el modelo de LLM desde el archivo .env
+    if not model:
+        raise RuntimeError("Falta LLM_MODEL: revisa tu archivo .env en la raíz del proyecto.")
 
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
