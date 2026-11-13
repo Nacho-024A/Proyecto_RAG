@@ -1,6 +1,6 @@
 # Nexora: chatbot RAG que responde con páginas citadas
 
-**Autor:** Andres David Osorio Moreno · **Curso:** Introducción a Inteligencia Artificial · **Fecha:** Noviembre de 2026
+**Autor:** Andres David Osorio Moreno y Juan Esteban Jimenez Cardona· **Curso:** Introducción a Inteligencia Artificial · **Fecha:** Noviembre de 2026
 
 Nexora es una aplicación web local donde se sube un PDF con texto, se le hacen preguntas y cada respuesta indica la página de donde sale la información. Al hacer clic en la cita, el visor abre esa página del documento.
 
